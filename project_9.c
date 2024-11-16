@@ -56,7 +56,7 @@ void daftar_pengguna() {
 
     printf("Pendaftaran\n");
     printf("Username: ");
-    scanf("%s", username);
+    fgets(username, sizeof(username), stdin);
     
     // Memeriksa apakah username valid
     if (!validasi_username(username)) {
