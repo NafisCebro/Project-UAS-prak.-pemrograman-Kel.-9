@@ -135,3 +135,37 @@ int main() {
 
     return 0;
 }
+
+#include <stdio.h>
+
+int main() {
+    int ans, poin = 0;
+    int kunci_jawaban[] = {2, 5, 1, 4, 3}; 
+    int no_soal = 5;
+    
+    char *questions[] = {
+    "Pertanyaan 1: Mana jawaban yang benar?\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
+    "Pertanyaan 2: Apa jawabannya?\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
+    "Pertanyaan 3: Pilih opsi yang benar.\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
+    "Pertanyaan 4: Apa jawaban yang benar?\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
+    "Pertanyaan 5: Pertanyaan terakhir!\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n"
+    };
+
+
+    for (int i = 0; i < no_soal; i++) {
+        printf("%s", questions[i]);
+        printf("Masukan Jawabanmu : ");
+        scanf("%d", &ans);
+
+        if (ans == kunci_jawaban[i]) {
+            poin += 20; 
+            printf("Benar! point anda sekarang %d .\n\n", poin);
+        } else {
+            printf("Salah! Game over... anda berhasil mendapatkan %d poin.\n", poin);
+            return 0;
+        }
+    }
+
+    printf("Selamat! anda memenangkan permainan ini dengan %d points!\n", poin);
+    return 0;
+}
