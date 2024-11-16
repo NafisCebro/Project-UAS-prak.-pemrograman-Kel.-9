@@ -136,7 +136,8 @@ int main() {
     return 0;
 }
 
-#include <stdio.h>
+// blok kode quis sementara
+void daftar_pengguna() {
 
 int main() {
     int ans, poin = 0;
@@ -169,3 +170,4 @@ int main() {
     printf("Selamat! anda memenangkan permainan ini dengan %d points!\n", poin);
     return 0;
 }
+}// akhir blok kode quiz
