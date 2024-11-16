@@ -72,7 +72,7 @@ void daftar_pengguna() {
     }
 
     printf("Password: ");
-    scanf("%s", password);
+    fgets(password, sizeof(password), stdin);
 
     // Memeriksa apakah password valid
     if (!validasi_password(password)) {
@@ -93,9 +93,9 @@ void login_pengguna() {
 
     printf("Login\n");
     printf("Username: ");
-    scanf("%s", username);
+    fgets(username, sizeof(username), stdin);
     printf("Password: ");
-    scanf("%s", password);
+    fgets(password, sizeof(password), stdin);
 
     for (int i = 0; i < jumlah_pengguna; i++) {
         if (strcmp(users[i].username, username) == 0 && strcmp(users[i].password, password) == 0) {
