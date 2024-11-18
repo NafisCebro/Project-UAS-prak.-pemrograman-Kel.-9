@@ -151,9 +151,9 @@ int main() {
     for (int i = 0; i < no_soal; i++) {
         printf("%s", questions[i]);
         printf("Masukan Jawabanmu : ");
-        scanf("%d", &ans);
+        scanf("%c", &ans[i]);
 
-        if (ans == kunci_jawaban[i]) {
+        if (ans[i] == kunci_jawaban[i]) {
             poin += 20; 
             printf("Benar! point anda sekarang %d .\n\n", poin);
         } else {
@@ -163,6 +163,7 @@ int main() {
     }
 
     printf("Selamat! anda memenangkan permainan ini dengan %d points!\n", poin);
+    }
     return 0;
 }
-}// akhir blok kode quiz
+// akhir blok kode quiz
