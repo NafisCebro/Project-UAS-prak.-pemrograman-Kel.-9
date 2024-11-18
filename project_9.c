@@ -131,25 +131,20 @@ int main() {
             default:
                 printf("Pilihan tidak valid. Silakan coba lagi.\n");
         }
-    }
 
-    return 0;
-}
-
-// blok kode quis sementara
-void daftar_pengguna() {
-
-int main() {
-    int ans, poin = 0;
-    int kunci_jawaban[] = {2, 5, 1, 4, 3}; 
+// blok kode quis
+    login_pengguna();
+    char ans[5];
+    int poin = 0;
+    char kunci_jawaban[] = {'a','b','c','d','c'}; 
     int no_soal = 5;
     
     char *questions[] = {
-    "Pertanyaan 1: Mana jawaban yang benar?\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
-    "Pertanyaan 2: Apa jawabannya?\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
-    "Pertanyaan 3: Pilih opsi yang benar.\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
-    "Pertanyaan 4: Apa jawaban yang benar?\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n",
-    "Pertanyaan 5: Pertanyaan terakhir!\n1. Jawaban 1\n2. Jawaban 2\n3. Jawaban 3\n4. Jawaban 4\n"
+    "Pertanyaan 1: Serangga apakah yang menyebabkan korsleting pada super komputer awal dan menjadi inspirasi munculnya istilah bug komputer?\na. ngengat\nb. kecoak\nc. kumbang\nd. kupu-kupu\n",
+    "Pertanyaan 2: Siapakah pencipta lagu Die With A Smile??\na. Lady Gaga\nb. Lady Gaga dan Bruno Mars\nc. Bruno Mars\nd. Zayn Malik\n",
+    "Pertanyaan 3: Siapakah diantara pria berikut yang tidak memiliki unsur kimia yang dinamai dalam namanya?\na. Albert Einstein\nb. Niels Bohr\nc. Isaac Newton\nd. Enrico Fermi\n",
+    "Pertanyaan 4: ... the look of love... adalah potongan lirik dari lagu yang berjudul?\na. Die With A Smile\nb. Night Changes\nc. If I Aint't Got You\nd. No.1 Party Anthem\n",
+    "Pertanyaan 5: Hewan apakah dumbo milik Walt Disney?\na. Rusa\nb. Kelinci\nc. Gajah\nd. Keledai\n"
     };
 
 
