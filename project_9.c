@@ -156,7 +156,7 @@ int main() {
     for (int i = 0; i < no_soal; i++) {
         printf("%s", questions[i]);
         printf("Masukan Jawabanmu : ");
-        fgets(ans, sizeof(ans), stdin);
+        scanf("%d", &ans);
 
         if (ans == kunci_jawaban[i]) {
             poin += 20; 
