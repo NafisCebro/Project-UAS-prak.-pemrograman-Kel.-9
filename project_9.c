@@ -136,7 +136,7 @@ int main() {
     login_pengguna();
     char ans[5];
     int poin = 0;
-    char kunci_jawaban[] = {'a','b','c','d','c'}; 
+    char kunci_jawaban[] = {'a','b','c','d','c','a','b','a','d','a'}; 
     int no_soal = 5;
     
     char *questions[] = {
@@ -145,11 +145,11 @@ int main() {
     "Pertanyaan 3: Siapakah diantara pria berikut yang tidak memiliki unsur kimia yang dinamai dalam namanya?\na. Albert Einstein\nb. Niels Bohr\nc. Isaac Newton\nd. Enrico Fermi\n",
     "Pertanyaan 4: ... the look of love... adalah potongan lirik dari lagu yang berjudul?\na. Die With A Smile\nb. Night Changes\nc. If I Aint't Got You\nd. No.1 Party Anthem\n",
     "Pertanyaan 5: Hewan apakah dumbo milik Walt Disney?\na. Rusa\nb. Kelinci\nc. Gajah\nd. Keledai\n"
-    "Pertanyaan 6:Siapakah nama rektor universitas syiah kuala?\na. Marwan\nb. Subianto\nc. Faisal\nd. Soraya\n"
-    "Pertanyaan 7:Siapakah istri dari pemimpin nazi?\na. Adolf Hitler\nb. Eva Braun \nc. Jane Austen \nd. Megawati\n"
-    "Pertanyaan 8:Siapakah penemu angka nol, aljabar, geometri, dan aritmatika?\na. Alkhawarizwmi\nb. Zhuishu\nc. Thales \nd. Aristoteles\n"
-    "Pertanyaan 9:Pada tahun berapa BPUPKI dibentuk?\na. 1991\nb. 1955\nc. 1943\nd. 1945\n"
-    "Pertanyaan 10:Siapakah penyanyi lagu APT?\na. Rose&Bruno mars\nb. Ayu tingting&Raffi Ahmad\nc. Ed sheeran&Lisa blackpink\nd. Bernadya&Bruno mars\n"
+    "Pertanyaan 6: Siapakah nama rektor universitas syiah kuala?\na. Marwan\nb. Subianto\nc. Faisal\nd. Soraya\n"
+    "Pertanyaan 7: Siapakah istri dari pemimpin nazi?\na. Adolf Hitler\nb. Eva Braun \nc. Jane Austen \nd. Megawati\n"
+    "Pertanyaan 8: Siapakah penemu angka nol, aljabar, geometri, dan aritmatika?\na. Alkhawarizwmi\nb. Zhuishu\nc. Thales \nd. Aristoteles\n"
+    "Pertanyaan 9: Pada tahun berapa BPUPKI dibentuk?\na. 1991\nb. 1955\nc. 1943\nd. 1945\n"
+    "Pertanyaan 10: Siapakah penyanyi lagu APT?\na. Rose&Bruno mars\nb. Ayu tingting&Raffi Ahmad\nc. Ed sheeran&Lisa blackpink\nd. Bernadya&Bruno mars\n"
     };
 
 
