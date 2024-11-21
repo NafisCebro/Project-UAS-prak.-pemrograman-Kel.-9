@@ -9,21 +9,25 @@
 typedef struct {
     char username[50];
     char password[50];
+    int points; 
 } User;
 
-// Prototipe fungsi
-int validasiPassword();
+// Prototypes
+int validasiPassword(const char *password);
 int loginUser();
-void quiz();
+void quiz(User loggedInUser);
 void menu();
 void menugame();
+void save_to_file(User user);
+void display_top_3();
 void registrasiUser();
+User get_logged_in_user();
 
-// Deklarasi timer
-HANDLE hTimer = NULL; // Global handle for the timer
-volatile bool timeout = false; // Timeout flag
+// Global Timer
+HANDLE hTimer = NULL;
+volatile bool timeout = false;
 
-// Function timer
+// Timer Thread Function
 DWORD WINAPI TimerThread(LPVOID lpParam) {
     Sleep(20000); // Wait for 20 seconds
     timeout = true; // Set timeout flag
@@ -47,7 +51,7 @@ int main() {
                 printf("\n==========================================\n");
                 break;
             case 2:
-                    printf("\n==========================================\n");
+                printf("\n==========================================\n");
                 if (loginUser()) {
                     printf("Login berhasil!\n");
                     printf("\n==========================================\n");
@@ -91,7 +95,7 @@ void registrasiUser() {
     printf("Masukkan username: ");
     fgets(userBaru.username, sizeof(userBaru.username), stdin);
     strtok(userBaru.username, "\n"); // Menghapus karakter newline
-       do {
+    do {
         printf("Masukkan password (minimal 4 karakter, 1 huruf besar, 1 angka): ");
         fgets(userBaru.password, sizeof(userBaru.password), stdin);
         strtok(userBaru.password, "\n"); // Menghapus karakter newline
@@ -100,7 +104,8 @@ void registrasiUser() {
             printf("Password tidak memenuhi syarat. Silakan coba lagi.\n");
         }
     } while (!validasiPassword(userBaru.password));
-   
+
+     userBaru.points = 0;
     fwrite(&userBaru, sizeof(User), 1, file);
     fclose(file);
 
@@ -142,7 +147,7 @@ void menugame() {
     do {
         printf("\n=== WHO WANTS TO BE A MILLIONARE! ===\n");
         printf("1. Mulai!\n");
-        printf("2. Peraturan\n");
+        printf("2. Ranking\n");
         printf("3. Logout\n");
         printf("\n==========================================\n");
         printf("\nMasukkan pilihan Anda: ");
@@ -152,12 +157,13 @@ void menugame() {
         switch (pilihan) {
             case 1:
                 printf("\n==========================================\n");
-                quiz();
+                User loggedInUser = get_logged_in_user();
+                quiz(loggedInUser);
                 printf("\n==========================================\n");
                 break;
             case 2:
                 printf("\n==========================================\n");
-                printf("Anda memilih Peraturan.\n");
+                display_top_3();
                 printf("\n==========================================\n");
                 break;
             case 3:
@@ -179,7 +185,7 @@ int validasiPassword(const char *password) {
     int adaAngka = 0;
 
     if (panjang < 4) {
-        return 0; // Password kurang dari 8 karakter
+        return 0;
     }
 
     for (int i = 0; i < panjang; i++) {
@@ -189,22 +195,47 @@ int validasiPassword(const char *password) {
         if (isdigit(password[i])) {
             adaAngka = 1;
         }
-        // Jika sudah menemukan huruf besar dan angka, tidak perlu melanjutkan
         if (adaUppercase && adaAngka) {
-            return 1; // Password valid
+            return 1;
         }
     }
 
-    return 0; // Tidak memenuhi syarat
+    return 0;
 }
 
-void quiz() {
-    int ans, poin = 0;
+void save_to_file(User user) {
+    FILE *file = fopen("database/login.bin", "ab");
+    if (!file) {
+        printf("Gagal membuka file untuk menyimpan data.\n");
+        return;
+    }
+
+    fwrite(&user, sizeof(User), 1, file);
+    fclose(file);
+    printf("Data pengguna telah disimpan.\n");
+}
+
+User get_logged_in_user() {
+    FILE *file = fopen("database/login.bin", "rb");
+    if (!file) {
+        printf("Gagal membuka file login.bin\n");
+        exit(1);
+    }
+
+    User user;
+    fread(&user, sizeof(User), 1, file);
+    fclose(file);
+
+    return user;
+}
+
+void quiz(User loggedInUser) {
+    int ans;
     int kunci_jawaban[] = {1, 2, 3, 4, 3, 1, 2, 1, 4, 1};
     int no_soal = 10;
 
     char *questions[] = {
-        "Pertanyaan 1: Serangga apa yang menyebabkan korsleting pada super komputer awal dan menjadi inspirasi munculnya istilah bug komputer?\n1. Ngengat\n2. Kecoak\n3. Kumbang\n4. Kupu-kupu\n",
+        "Pertanyaan 1: Serangga apakah yang menyebabkan korsleting pada super komputer awal?\n1. Ngengat\n2. Kecoak\n3. Kumbang\n4. Kupu-kupu\n",
         "Pertanyaan 2: Siapakah pencipta lagu Die With A Smile?\n1. Lady Gaga\n2. Lady Gaga dan Bruno Mars\n3. Bruno Mars\n4. Zayn Malik\n",
         "Pertanyaan 3: Siapakah diantara pria berikut yang tidak memiliki unsur kimia yang dinamai dalam namanya?\n1. Albert Einstein\n2. Niels Bohr\n3. Isaac Newton\n4. Enrico Fermi\n",
         "Pertanyaan 4: ... the look of love... adalah potongan lirik dari lagu yang berjudul?\n1. Die With A Smile\n2. Night Changes\n3. If I Ain't Got You\n4. No.1 Party Anthem\n",
@@ -212,9 +243,11 @@ void quiz() {
         "Pertanyaan 6: Siapakah nama rektor Universitas Syiah Kuala?\n1. Marwan\n2. Subianto\n3. Faisal\n4. Soraya\n",
         "Pertanyaan 7: Siapakah istri dari pemimpin Nazi?\n1. Adolf Hitler\n2. Eva Braun\n3. Jane Austen\n4. Megawati\n",
         "Pertanyaan 8: Siapakah penemu angka nol, aljabar, geometri, dan aritmatika?\n1. Alkhawarizmi\n2. Zhuishu\n3. Thales\n4. Aristoteles\n",
-        "Pertanyaan 9: Pada tahun berapa BPUPKI dibentuk?\n1. 1991\n2. 1955\n3. 1943\n4. 1945\n",
-        "Pertanyaan 10: Siapakah penyanyi lagu APT?\n1. Rose & Bruno Mars\n2. Ayu Tingting & Raffi Ahmad\n3. Ed Sheeran & Lisa Blackpink\n4. Bernadya & Bruno Mars\n"
+        "Pertanyaan 9: Berapakah angka Romawi untuk 28?\n1. XIII\n2. XIV\n3. XVIII\n4. XXVIII\n",
+        "Pertanyaan 10: Siapakah nama dari novelis 'To Kill a Mockingbird'?\n1. Harper Lee\n2. Joyce Briley\n3. Mary Lou Higgins\n4. Ann Marie\n",
     };
+
+    printf("\nSelamat datang di Quiz! Anda punya 20 detik untuk setiap pertanyaan!\n");
 
     for (int i = 0; i < no_soal; i++) {
         timeout = false; // Reset timeout flag
@@ -226,9 +259,10 @@ void quiz() {
         HANDLE hThread = CreateThread(NULL, 0, TimerThread, NULL, 0, &threadID);
 
         if (scanf("%d", &ans) != 1 || timeout) {
-            printf("\nWaktu habis atau input tidak valid! Game over... Anda berhasil mendapatkan %d poin.\n", poin);
+            printf("\nWaktu habis atau input tidak valid! Game over... Anda berhasil mendapatkan %d poin.\n", loggedInUser.points);
             TerminateThread(hThread, 0); // Clean up timer thread
             CloseHandle(hThread);
+            save_to_file(loggedInUser); // Save data to file
             return;
         }
 
@@ -236,13 +270,49 @@ void quiz() {
         CloseHandle(hThread);
 
         if (ans == kunci_jawaban[i]) {
-            poin += 10;
-            printf("Benar! Poin Anda sekarang %d.\n\n", poin);
+            loggedInUser.points += 10;
+            printf("Benar! Poin Anda sekarang %d.\n\n", loggedInUser.points);
         } else {
-            printf("Salah! Game over... Anda berhasil mendapatkan %d poin.\n", poin);
+            printf("Salah! Game over... Anda berhasil mendapatkan %d poin.\n", loggedInUser.points);
+            save_to_file(loggedInUser); // Save data to file
             return;
         }
     }
 
-    printf("Selamat! Anda memenangkan permainan ini dengan %d poin!\n", poin);
+    printf("Selamat! Anda memenangkan permainan ini dengan %d poin!\n", loggedInUser.points);
+    save_to_file(loggedInUser); // Save data to file
 }
+
+
+void display_top_3() {
+    FILE *file = fopen("database/login.bin", "rb");
+    if (!file) {
+        printf("Gagal membuka file login.bin\n");
+        return;
+    }
+
+    User users[100];
+    int count = 0;
+
+    while (fread(&users[count], sizeof(User), 1, file)) {
+        count++;
+    }
+    fclose(file);
+
+    // Sort users by points in descending order
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (users[j].points < users[j + 1].points) {
+                User temp = users[j];
+                users[j] = users[j + 1];
+                users[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\n=== Top 3 Pemain ===\n");
+    for (int i = 0; i < count && i < 3; i++) {
+        printf("%d. %s - %d poin\n", i + 1, users[i].username, users[i].points);
+    }
+}
+
