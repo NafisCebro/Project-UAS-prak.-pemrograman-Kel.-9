@@ -126,7 +126,7 @@ void menugame() {
         printf("\n==========================================\n");
         printf("\n>>>   WHO WANTS TO BE A MILLIONARE!   <<<\n\n");
         printf("1. Mulai!\n");
-        printf("2. Ranking\n");
+        printf("2. Rules\n");
         printf("3. Logout\n");
         printf("\n==========================================\n");
         printf("\nMasukkan pilihan Anda: ");
