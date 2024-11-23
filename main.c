@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <windows.h>
-#include <time.h>
 
+int pilihan;
 // Struktur User
 typedef struct {
     char username[50];
     char password[50];
-    int points;
+    int points; 
 } User;
 
 // Global Timer
@@ -24,14 +26,14 @@ DWORD WINAPI TimerThread(LPVOID lpParam) {
 }
 
 // Prototypes
-int validasiPassword(const char *password);
-int loginUser(const char *username, const char *password);
-void quiz(User *loggedInUser);
+int validasiPassword();
+int loginUser();
+void quiz();
 void rules();
 void menugame();
-void registrasiUser(const char *username, const char *password);
+void registrasiUser();
+void save_to_file();
 User get_logged_in_user();
-void save_to_file(User *user);
 
 // Fungsi utama
 int main(int argc, char *argv[]) {
@@ -96,6 +98,7 @@ void registrasiUser(const char *username, const char *password) {
 }
 
 // Fungsi untuk login pengguna
+// Fungsi untuk login pengguna dengan CLA
 int loginUser(const char *username, const char *password) {
     FILE *file = fopen("database/login.bin", "rb");
     if (!file) {
@@ -134,7 +137,7 @@ void menugame() {
             case 1:
                 printf("\n==========================================\n");
                 User loggedInUser = get_logged_in_user();
-                quiz(&loggedInUser);
+                quiz(loggedInUser);
                 break;
             case 2:
                 rules();
@@ -190,26 +193,19 @@ User get_logged_in_user() {
     return user;
 }
 
-void save_to_file(User *user) {
-    FILE *file = fopen("database/login.bin", "rb+");
+void save_to_file(User user) {
+    FILE *file = fopen("database/login.bin", "ab");
     if (!file) {
         printf("Gagal membuka file untuk menyimpan data.\n");
         return;
     }
 
-    User userAda;
-    while (fread(&userAda, sizeof(User), 1, file)) {
-        if (strcmp(userAda.username, user->username) == 0) {
-            fseek(file, -sizeof(User), SEEK_CUR); // Go back to the user's position
-            fwrite(user, sizeof(User), 1, file);
-            fclose(file);
-            return;
-        }
-    }
+    fwrite(&user, sizeof(User), 1, file);
     fclose(file);
 }
 
-void quiz(User *loggedInUser) {
+
+void quiz(User loggedInUser) {
     int ans;
     int kunci_jawaban[] = {1, 2, 3, 4, 3, 1, 2, 1, 4, 1};
     int no_soal = 10;
@@ -234,28 +230,35 @@ void quiz(User *loggedInUser) {
         printf("%s", questions[i]);
         printf("Masukkan Jawabanmu (waktu 20 detik): ");
 
-        // Start timer in background
-        hTimer = CreateThread(NULL, 0, TimerThread, NULL, 0, NULL);
-        scanf("%d", &ans);
-        TerminateThread(hTimer, 0);
-        CloseHandle(hTimer);
+        // Create a thread for the timer
+        DWORD threadID;
+        HANDLE hThread = CreateThread(NULL, 0, TimerThread, NULL, 0, &threadID);
 
-        if (timeout) {
-            printf("\nWaktu habis!\n");
-            break;
+        if (scanf("%d", &ans) != 1 || timeout) {
+            printf("\nWaktu habis atau input tidak valid! Game over... Anda berhasil mendapatkan %d poin.\n", loggedInUser.points);
+            TerminateThread(hThread, 0); // Clean up timer thread
+            CloseHandle(hThread);
+            save_to_file(loggedInUser); // Save data to file
+            return;
         }
 
+        TerminateThread(hThread, 0); // Cancel the timer thread
+        CloseHandle(hThread);
+
         if (ans == kunci_jawaban[i]) {
-            printf("Jawaban benar!\n");
-            loggedInUser->points += 10;
+            loggedInUser.points += 10;
+            printf("Benar! Poin Anda sekarang %d.\n\n", loggedInUser.points);
         } else {
-            printf("Jawaban salah!\n");
+            printf("Salah! Game over... Anda berhasil mendapatkan %d poin.\n", loggedInUser.points);
+            save_to_file(loggedInUser); // Save data to file
+            return;
         }
     }
 
-    save_to_file(loggedInUser); // Save points after the quiz
-    printf("Skor Anda: %d\n", loggedInUser->points);
+    printf("Selamat! Anda memenangkan permainan ini dengan %d poin!\n", loggedInUser.points);
+    save_to_file(loggedInUser); // Save data to file
 }
+
 
 void rules() {
     printf("\n\n==========================================\n");
