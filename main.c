@@ -22,6 +22,7 @@ void menugame();
 void save_to_file(User user);
 void display_top_3();
 void registrasiUser();
+void create_directory_if_not_exist();
 User get_logged_in_user();
 
 // Global Timer
@@ -38,6 +39,7 @@ DWORD WINAPI TimerThread(LPVOID lpParam) {
 
 // Fungsi utama
 int main() {
+    create_directory_if_not_exist();
     int pilihan;
     do {
         menu();
