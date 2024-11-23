@@ -17,6 +17,7 @@ int validasiPassword(const char *password);
 int loginUser();
 void quiz(User loggedInUser);
 void menu();
+void rules();
 void menugame();
 void save_to_file(User user);
 void display_top_3();
@@ -31,7 +32,7 @@ volatile bool timeout = false;
 DWORD WINAPI TimerThread(LPVOID lpParam) {
     Sleep(20000); // Wait for 20 seconds
     timeout = true; // Set timeout flag
-    printf("\nWaktu habis! Game over...\n");
+    printf("\nWaktu habis! Game over...");
     return 0;
 }
 
@@ -46,23 +47,20 @@ int main() {
 
         switch (pilihan) {
             case 1:
-                printf("\n==========================================\n");
+                printf("\n==========================================\n\n");
                 registrasiUser();
-                printf("\n==========================================\n");
                 break;
             case 2:
                 printf("\n==========================================\n");
                 if (loginUser()) {
-                    printf("Login berhasil!\n");
-                    printf("\n==========================================\n");
+                    printf("\nLogin berhasil!\n");
                     menugame();
                 } else {
-                    printf("Login gagal. Username atau password salah.\n");
-                    printf("\n==========================================\n");
+                    printf("\nLogin gagal. Username atau password salah.\n");
                 }
                 break;
             case 3:
-                printf("\n==========================================\n");
+                printf("\n==========================================\n\n");
                 printf("Keluar dari program... Sampai jumpa lagi...\n");
                 printf("\n==========================================\n");
                 break;
@@ -76,8 +74,9 @@ int main() {
 
 // Fungsi untuk menampilkan menu
 void menu() {
-    printf("\n=== Login Untuk Bermain! ===\n");
-    printf("1. Registrasi\n");
+    printf("\n==========================================\n");
+    printf("\n     >>>   Login Untuk Bermain!   <<<     \n\n");
+    printf("1. Register\n");
     printf("2. Login\n");
     printf("3. Keluar\n");
     printf("\n==========================================\n");
@@ -145,10 +144,12 @@ void menugame() {
     int pilihan;
 
     do {
-        printf("\n=== WHO WANTS TO BE A MILLIONARE! ===\n");
+        printf("\n==========================================\n");
+        printf("\n>>>   WHO WANTS TO BE A MILLIONARE!   <<<\n\n");
         printf("1. Mulai!\n");
         printf("2. Ranking\n");
-        printf("3. Logout\n");
+        printf("3. Peraturan\n");
+        printf("4. Logout\n");
         printf("\n==========================================\n");
         printf("\nMasukkan pilihan Anda: ");
         scanf("%d", &pilihan);
@@ -159,24 +160,24 @@ void menugame() {
                 printf("\n==========================================\n");
                 User loggedInUser = get_logged_in_user();
                 quiz(loggedInUser);
-                printf("\n==========================================\n");
                 break;
             case 2:
                 printf("\n==========================================\n");
                 display_top_3();
-                printf("\n==========================================\n");
                 break;
             case 3:
-                printf("\n==========================================\n");
+                rules();
+                break;
+            case 4:
+                printf("\n==========================================\n\n");
                 printf("Logout berhasil. Kembali ke menu utama.\n");
-                printf("\n==========================================\n");
                 break;
             default:
                 printf("\n==========================================\n");
                 printf("Pilihan tidak valid. Silakan coba lagi.\n");
                 printf("\n==========================================\n");
         }
-    } while (pilihan != 3);
+    } while (pilihan != 4);
 }
 
 int validasiPassword(const char *password) {
@@ -212,7 +213,6 @@ void save_to_file(User user) {
 
     fwrite(&user, sizeof(User), 1, file);
     fclose(file);
-    printf("Data pengguna telah disimpan.\n");
 }
 
 User get_logged_in_user() {
@@ -310,9 +310,27 @@ void display_top_3() {
         }
     }
 
-    printf("\n=== Top 3 Pemain ===\n");
+    printf("\n>>>  Top 3 Pemain  <<<\n");
     for (int i = 0; i < count && i < 3; i++) {
         printf("%d. %s - %d poin\n", i + 1, users[i].username, users[i].points);
     }
 }
+
+void rules() {
+    printf("\n\n==========================================\n");
+    printf("            Aturan Permainan            \n");
+    printf("==========================================\n\n");
+    printf("1. Permainan terdiri dari 10 pertanyaan pilihan ganda.\n");
+    printf("2. Setiap pertanyaan memiliki empat opsi jawaban (1, 2, 3, 4).\n");
+    printf("3. Anda memiliki waktu 20 detik untuk menjawab setiap pertanyaan.\n");
+    printf("4. Masukkan jawaban Anda dengan mengetik nomor yang sesuai dengan pilihan Anda (misalnya: 1, 2, 3, atau 4).\n");
+    printf("5. Setiap jawaban benar bernilai 10 poin.\n");
+    printf("6. Jawaban yang salah atau tidak menjawab dalam waktu 20 detik akan langsung mengakhiri permainan.\n");
+    printf("7. Skor Anda saat ini akan ditampilkan jika permainan berakhir sebelum selesai.\n");
+    printf("8. Jawab semua 10 pertanyaan dengan benar untuk mencapai skor maksimum 100 poin.\n");
+    printf("9. Kemajuan Anda akan disimpan secara otomatis saat permainan berakhir.\n");
+    printf("10. Pastikan input Anda valid (angka antara 1 hingga 4).\n");
+    printf("\nSemoga beruntung dan selamat bermain!\n");
+}
+
 
