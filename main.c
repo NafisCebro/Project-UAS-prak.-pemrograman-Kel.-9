@@ -97,7 +97,7 @@ void registrasiUser(const char *username, const char *password) {
     fclose(file);
 }
 
-// Fungsi untuk login pengguna
+//Fungsi untuk login pengguna
 // Fungsi untuk login pengguna dengan CLA
 int loginUser(const char *username, const char *password) {
     FILE *file = fopen("database/login.bin", "rb");
@@ -111,7 +111,7 @@ int loginUser(const char *username, const char *password) {
         if (strcmp(userAda.username, username) == 0 &&
             strcmp(userAda.password, password) == 0) {
             fclose(file);
-            return 1; // Login berhasil
+            return 0;// Login berhasil
         }
     }
 
