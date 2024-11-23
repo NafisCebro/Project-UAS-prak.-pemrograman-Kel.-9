@@ -1,29 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include <stdbool.h>
 #include <windows.h>
+#include <time.h>
 
 // Struktur User
 typedef struct {
     char username[50];
     char password[50];
-    int points; 
+    int points;
 } User;
-
-// Prototypes
-int validasiPassword(const char *password);
-int loginUser();
-void quiz(User loggedInUser);
-void menu();
-void rules();
-void menugame();
-void save_to_file(User user);
-void display_top_3();
-void registrasiUser();
-void create_directory_if_not_exist();
-User get_logged_in_user();
 
 // Global Timer
 HANDLE hTimer = NULL;
@@ -37,55 +23,63 @@ DWORD WINAPI TimerThread(LPVOID lpParam) {
     return 0;
 }
 
-// Fungsi utama
-int main() {
-    create_directory_if_not_exist();
-    int pilihan;
-    do {
-        menu();
-        printf("\nMasukkan pilihan Anda: ");
-        scanf("%d", &pilihan);
-        getchar(); // Membersihkan karakter newline
+// Prototypes
+int validasiPassword(const char *password);
+int loginUser(const char *username, const char *password);
+void quiz(User *loggedInUser);
+void rules();
+void menugame();
+void registrasiUser(const char *username, const char *password);
+User get_logged_in_user();
+void save_to_file(User *user);
 
-        switch (pilihan) {
-            case 1:
-                printf("\n==========================================\n\n");
-                registrasiUser();
-                break;
-            case 2:
-                printf("\n==========================================\n");
-                if (loginUser()) {
-                    printf("\nLogin berhasil!\n");
-                    menugame();
-                } else {
-                    printf("\nLogin gagal. Username atau password salah.\n");
-                }
-                break;
-            case 3:
-                printf("\n==========================================\n\n");
-                printf("Keluar dari program... Sampai jumpa lagi...\n");
-                printf("\n==========================================\n");
-                break;
-            default:
-                printf("Pilihan tidak valid. Silakan coba lagi.\n");
+// Fungsi utama
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Penggunaan:\n");
+        printf("1. Registrasi: %s register <username> <password>\n", argv[0]);
+        printf("2. Login: %s login <username> <password>\n", argv[0]);
+        return 1;
+    }
+
+    if (strcmp(argv[1], "register") == 0) {
+        if (argc != 4) {
+            printf("Format registrasi: %s register <username> <password>\n", argv[0]);
+            return 1;
         }
-    } while (pilihan != 3);
+        const char *username = argv[2];
+        const char *password = argv[3];
+
+        if (!validasiPassword(password)) {
+            printf("Password tidak memenuhi syarat. Minimal 4 karakter, 1 huruf besar, 1 angka.\n");
+            return 1;
+        }
+
+        registrasiUser(username, password);
+        printf("Registrasi berhasil untuk user: %s\n", username);
+    } else if (strcmp(argv[1], "login") == 0) {
+        if (argc != 4) {
+            printf("Format login: %s login <username> <password>\n", argv[0]);
+            return 1;
+        }
+        const char *username = argv[2];
+        const char *password = argv[3];
+
+        if (loginUser(username, password)) {
+            printf("Login berhasil! Selamat datang, %s.\n", username);
+            menugame();
+        } else {
+            printf("Login gagal. Username atau password salah.\n");
+        }
+    } else {
+        printf("Perintah tidak dikenal. Gunakan 'register' atau 'login'.\n");
+    }
 
     return 0;
 }
 
-// Fungsi untuk menampilkan menu
-void menu() {
-    printf("\n==========================================\n");
-    printf("\n     >>>   Login Untuk Bermain!   <<<     \n\n");
-    printf("1. Register\n");
-    printf("2. Login\n");
-    printf("3. Keluar\n");
-    printf("\n==========================================\n");
-}
-
-// Fungsi untuk registrasi pengguna baru
-void registrasiUser() {
+// Fungsi untuk registrasi pengguna baru dengan CLA
+void registrasiUser(const char *username, const char *password) {
     FILE *file = fopen("database/login.bin", "ab");
     if (!file) {
         perror("Tidak dapat membuka file");
@@ -93,41 +87,21 @@ void registrasiUser() {
     }
 
     User userBaru;
-    printf("Masukkan username: ");
-    fgets(userBaru.username, sizeof(userBaru.username), stdin);
-    strtok(userBaru.username, "\n"); // Menghapus karakter newline
-    do {
-        printf("Masukkan password (minimal 4 karakter, 1 huruf besar, 1 angka): ");
-        fgets(userBaru.password, sizeof(userBaru.password), stdin);
-        strtok(userBaru.password, "\n"); // Menghapus karakter newline
+    strncpy(userBaru.username, username, sizeof(userBaru.username));
+    strncpy(userBaru.password, password, sizeof(userBaru.password));
+    userBaru.points = 0;
 
-        if (!validasiPassword(userBaru.password)) {
-            printf("Password tidak memenuhi syarat. Silakan coba lagi.\n");
-        }
-    } while (!validasiPassword(userBaru.password));
-
-     userBaru.points = 0;
     fwrite(&userBaru, sizeof(User), 1, file);
     fclose(file);
-
-    printf("Registrasi berhasil!\n");
 }
 
 // Fungsi untuk login pengguna
-int loginUser() {
+int loginUser(const char *username, const char *password) {
     FILE *file = fopen("database/login.bin", "rb");
     if (!file) {
         perror("Tidak dapat membuka file");
         return 0;
     }
-
-    char username[50], password[50];
-    printf("\nMasukkan username: ");
-    fgets(username, sizeof(username), stdin);
-    strtok(username, "\n"); // Menghapus karakter newline
-    printf("Masukkan password: ");
-    fgets(password, sizeof(password), stdin);
-    strtok(password, "\n"); // Menghapus karakter newline
 
     User userAda;
     while (fread(&userAda, sizeof(User), 1, file)) {
@@ -150,8 +124,7 @@ void menugame() {
         printf("\n>>>   WHO WANTS TO BE A MILLIONARE!   <<<\n\n");
         printf("1. Mulai!\n");
         printf("2. Ranking\n");
-        printf("3. Peraturan\n");
-        printf("4. Logout\n");
+        printf("3. Logout\n");
         printf("\n==========================================\n");
         printf("\nMasukkan pilihan Anda: ");
         scanf("%d", &pilihan);
@@ -161,25 +134,22 @@ void menugame() {
             case 1:
                 printf("\n==========================================\n");
                 User loggedInUser = get_logged_in_user();
-                quiz(loggedInUser);
+                quiz(&loggedInUser);
                 break;
             case 2:
-                printf("\n==========================================\n");
-                display_top_3();
-                break;
-            case 3:
                 rules();
                 break;
-            case 4:
+            case 3:
                 printf("\n==========================================\n\n");
-                printf("Logout berhasil. Kembali ke menu utama.\n");
+                printf("Logout berhasil... Sampai Jumpa...\n");
+                printf("\n==========================================\n");
                 break;
             default:
                 printf("\n==========================================\n");
                 printf("Pilihan tidak valid. Silakan coba lagi.\n");
                 printf("\n==========================================\n");
         }
-    } while (pilihan != 4);
+    } while (pilihan != 3);
 }
 
 int validasiPassword(const char *password) {
@@ -206,25 +176,6 @@ int validasiPassword(const char *password) {
     return 0;
 }
 
-void save_to_file(User user) {
-    FILE *file = fopen("database/login.bin", "ab");
-    if (!file) {
-        printf("Gagal membuka file untuk menyimpan data.\n");
-        return;
-    }
-
-    fwrite(&user, sizeof(User), 1, file);
-    fclose(file);
-}
-void create_directory_if_not_exist() {
-    if (CreateDirectory("database", NULL) || GetLastError() == ERROR_ALREADY_EXISTS){
-        printf("Direktori 'database' telah dibuat atau sudah ada.\n");
-    }
-    else{
-        printf("Gagal membuat direktori 'database'. Error %lu\n", GetLastError());
-    }
-}
-
 User get_logged_in_user() {
     FILE *file = fopen("database/login.bin", "rb");
     if (!file) {
@@ -239,7 +190,26 @@ User get_logged_in_user() {
     return user;
 }
 
-void quiz(User loggedInUser) {
+void save_to_file(User *user) {
+    FILE *file = fopen("database/login.bin", "rb+");
+    if (!file) {
+        printf("Gagal membuka file untuk menyimpan data.\n");
+        return;
+    }
+
+    User userAda;
+    while (fread(&userAda, sizeof(User), 1, file)) {
+        if (strcmp(userAda.username, user->username) == 0) {
+            fseek(file, -sizeof(User), SEEK_CUR); // Go back to the user's position
+            fwrite(user, sizeof(User), 1, file);
+            fclose(file);
+            return;
+        }
+    }
+    fclose(file);
+}
+
+void quiz(User *loggedInUser) {
     int ans;
     int kunci_jawaban[] = {1, 2, 3, 4, 3, 1, 2, 1, 4, 1};
     int no_soal = 10;
@@ -264,66 +234,27 @@ void quiz(User loggedInUser) {
         printf("%s", questions[i]);
         printf("Masukkan Jawabanmu (waktu 20 detik): ");
 
-        // Create a thread for the timer
-        DWORD threadID;
-        HANDLE hThread = CreateThread(NULL, 0, TimerThread, NULL, 0, &threadID);
+        // Start timer in background
+        hTimer = CreateThread(NULL, 0, TimerThread, NULL, 0, NULL);
+        scanf("%d", &ans);
+        TerminateThread(hTimer, 0);
+        CloseHandle(hTimer);
 
-        if (scanf("%d", &ans) != 1 || timeout) {
-            printf("\nWaktu habis atau input tidak valid! Game over... Anda berhasil mendapatkan %d poin.\n", loggedInUser.points);
-            TerminateThread(hThread, 0); // Clean up timer thread
-            CloseHandle(hThread);
-            save_to_file(loggedInUser); // Save data to file
-            return;
+        if (timeout) {
+            printf("\nWaktu habis!\n");
+            break;
         }
-
-        TerminateThread(hThread, 0); // Cancel the timer thread
-        CloseHandle(hThread);
 
         if (ans == kunci_jawaban[i]) {
-            loggedInUser.points += 10;
-            printf("Benar! Poin Anda sekarang %d.\n\n", loggedInUser.points);
+            printf("Jawaban benar!\n");
+            loggedInUser->points += 10;
         } else {
-            printf("Salah! Game over... Anda berhasil mendapatkan %d poin.\n", loggedInUser.points);
-            save_to_file(loggedInUser); // Save data to file
-            return;
+            printf("Jawaban salah!\n");
         }
     }
 
-    printf("Selamat! Anda memenangkan permainan ini dengan %d poin!\n", loggedInUser.points);
-    save_to_file(loggedInUser); // Save data to file
-}
-
-
-void display_top_3() {
-    FILE *file = fopen("database/login.bin", "rb");
-    if (!file) {
-        printf("Gagal membuka file login.bin\n");
-        return;
-    }
-
-    User users[100];
-    int count = 0;
-
-    while (fread(&users[count], sizeof(User), 1, file)) {
-        count++;
-    }
-    fclose(file);
-
-    // Sort users by points in descending order
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
-            if (users[j].points < users[j + 1].points) {
-                User temp = users[j];
-                users[j] = users[j + 1];
-                users[j + 1] = temp;
-            }
-        }
-    }
-
-    printf("\n>>>  Top 3 Pemain  <<<\n");
-    for (int i = 0; i < count && i < 3; i++) {
-        printf("%d. %s - %d poin\n", i + 1, users[i].username, users[i].points);
-    }
+    save_to_file(loggedInUser); // Save points after the quiz
+    printf("Skor Anda: %d\n", loggedInUser->points);
 }
 
 void rules() {
@@ -342,5 +273,3 @@ void rules() {
     printf("10. Pastikan input Anda valid (angka antara 1 hingga 4).\n");
     printf("\nSemoga beruntung dan selamat bermain!\n");
 }
-
-
