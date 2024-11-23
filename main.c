@@ -216,6 +216,14 @@ void save_to_file(User user) {
     fwrite(&user, sizeof(User), 1, file);
     fclose(file);
 }
+void create_directory_if_not_exist() {
+    if (CreateDirectory("database", NULL) || GetLastError() == ERROR_ALREADY_EXISTS){
+        printf("Direktori 'database' telah dibuat atau sudah ada.\n");
+    }
+    else{
+        printf("Gagal membuat direktori 'database'. Error %lu\n", GetLastError());
+    }
+}
 
 User get_logged_in_user() {
     FILE *file = fopen("database/login.bin", "rb");
