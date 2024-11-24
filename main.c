@@ -5,8 +5,7 @@
 #include <stdbool.h>
 #include <windows.h>
 
-int pilihan;
-// Struktur User
+// Struct User
 typedef struct {
     char username[50];
     char password[50];
@@ -17,15 +16,15 @@ typedef struct {
 HANDLE hTimer = NULL;
 volatile bool timeout = false;
 
-// Timer Thread Function
+// Function Timer
 DWORD WINAPI TimerThread(LPVOID lpParam) {
-    Sleep(20000); // Wait for 20 seconds
-    timeout = true; // Set timeout flag
+    Sleep(20000); // Timer untuk 20 detik
+    timeout = true; // flag untuk timeout 
     printf("\nWaktu habis! Game over...");
     return 0;
 }
 
-// Prototypes
+// Function Prototipe
 int validasiPassword();
 int loginUser();
 void quiz();
@@ -97,7 +96,7 @@ void registrasiUser(const char *username, const char *password) {
     fclose(file);
 }
 
-//Fungsi untuk login pengguna
+// Fungsi untuk login pengguna
 // Fungsi untuk login pengguna dengan CLA
 int loginUser(const char *username, const char *password) {
     FILE *file = fopen("database/login.bin", "rb");
@@ -111,7 +110,7 @@ int loginUser(const char *username, const char *password) {
         if (strcmp(userAda.username, username) == 0 &&
             strcmp(userAda.password, password) == 0) {
             fclose(file);
-            return 0;// Login berhasil
+            return 1; // Login berhasil
         }
     }
 
@@ -126,7 +125,7 @@ void menugame() {
         printf("\n==========================================\n");
         printf("\n>>>   WHO WANTS TO BE A MILLIONARE!   <<<\n\n");
         printf("1. Mulai!\n");
-        printf("2. Rules\n");
+        printf("2. Peraturan\n");
         printf("3. Logout\n");
         printf("\n==========================================\n");
         printf("\nMasukkan pilihan Anda: ");
@@ -204,7 +203,6 @@ void save_to_file(User user) {
     fclose(file);
 }
 
-
 void quiz(User loggedInUser) {
     int ans;
     int kunci_jawaban[] = {1, 2, 3, 4, 3, 1, 2, 1, 4, 1};
@@ -259,9 +257,8 @@ void quiz(User loggedInUser) {
     save_to_file(loggedInUser); // Save data to file
 }
 
-
 void rules() {
-    printf("\n\n==========================================\n");
+    printf("\n==========================================\n");
     printf("            Aturan Permainan            \n");
     printf("==========================================\n\n");
     printf("1. Permainan terdiri dari 10 pertanyaan pilihan ganda.\n");
